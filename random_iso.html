@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>ISO random</title>
+</head>
+<body>
+<pre id="result"></pre>
+<script>
+const ISO = "AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HM HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU WF WS YE YT ZA ZM ZW".split(" ");
+
+const CATEGORIES = {
+  1: "国の文化",
+  2: "海",
+  3: "山",
+  4: "ハイテク",
+  5: "環境保全",
+  6: "偉人",
+  7: "虫",
+  8: "動物",
+  9: "植物"
+};
+
+// 暗号論的乱数によるFisher-Yatesシャッフル（重複なしで割り当て）
+function randInt(max) {
+  const buf = new Uint32Array(1);
+  const limit = Math.floor(0x100000000 / max) * max;
+  do { crypto.getRandomValues(buf); } while (buf[0] >= limit);
+  return buf[0] % max;
+}
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = randInt(i + 1);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const picked = shuffle(ISO).slice(0, Object.keys(CATEGORIES).length);
+const result = {};
+Object.keys(CATEGORIES).forEach((k, i) => {
+  result[k] = { category: CATEGORIES[k], iso: picked[i] };
+});
+
+document.getElementById("result").textContent = JSON.stringify(result, null, 2);
+window.RESULT = result;
+</script>
+</body>
+</html>
